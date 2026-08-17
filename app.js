@@ -5,13 +5,13 @@
    e crie MANUALMENTE o usuário admin@admin.com (não há cadastro público).
    ======================================================================= */
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:xxxxxxxxxxxx"
+    apiKey: "AIzaSyAQUCCvXQFuCcRHBqNqg4XxSENa8Xv0WeA",
+    authDomain: "gamesbonus.firebaseapp.com",
+    databaseURL: "https://gamesbonus-default-rtdb.firebaseio.com", 
+    projectId: "gamesbonus",
+    storageBucket: "gamesbonus.firebasestorage.app",
+    messagingSenderId: "1066854012332",
+    appId: "1:1066854012332:web:0caad49aa18422b39b9609"
 };
 
 const ADMIN_EMAIL = "admin@admin.com";
