@@ -17,13 +17,13 @@
    ===================================================================== */
 
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:xxxxxxxxxxxxxxxx",
+  apiKey: "AIzaSyBpoQKy0-dEgsM4cljmwbFgKWxhQkpjDkk",
+  authDomain: "bonus2-ec9d5.firebaseapp.com",
+  databaseURL: "https://console.firebase.google.com/u/1/project/bonus2-ec9d5/database/bonus2-ec9d5-default-rtdb/data/~2F",
+  projectId: "bonus2-ec9d5",
+  storageBucket: "bonus2-ec9d5.firebasestorage.app",
+  messagingSenderId: "463777197593",
+  appId: "1:463777197593:web:2b8fa4c1c062eb31df4488"
 };
 
 const ADMIN_EMAIL = "admin@admin.com";
