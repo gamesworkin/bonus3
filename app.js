@@ -19,7 +19,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyBpoQKy0-dEgsM4cljmwbFgKWxhQkpjDkk",
   authDomain: "bonus2-ec9d5.firebaseapp.com",
-  databaseURL: "https://console.firebase.google.com/u/1/project/bonus2-ec9d5/database/bonus2-ec9d5-default-rtdb/data/~2F",
+  databaseURL: "https://bonus2-ec9d5-default-rtdb.firebaseio.com/",
   projectId: "bonus2-ec9d5",
   storageBucket: "bonus2-ec9d5.firebasestorage.app",
   messagingSenderId: "463777197593",
