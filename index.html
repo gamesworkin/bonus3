@@ -3,213 +3,230 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GameHub — Central de Jogos</title>
-<meta name="description" content="Central de jogos: pesquise por nome, plataforma, categoria ou código único e baixe direto." />
+<title>GameVault — Biblioteca de Jogos</title>
+<meta name="description" content="Catálogo de jogos com informações detalhadas e links de download." />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- ===== TOPBAR / MENU ===== -->
+<!-- ================= HEADER ================= -->
 <header class="topbar">
   <div class="topbar-inner">
-    <button id="themeBtn" class="icon-btn" title="Alternar tema">🌙</button>
-
-    <a class="brand" href="#">
+    <a class="brand" href="#" id="brandLink">
       <img id="logoSquare" class="logo-square" alt="Logo" hidden />
-      <img id="logoWord" class="logo-word" alt="Logo escrita" hidden />
-      <span id="brandFallback" class="brand-fallback">GameHub</span>
+      <img id="logoWord" class="logo-word" alt="Nome do site" hidden />
+      <span id="brandFallback" class="brand-fallback">GameVault</span>
     </a>
 
-    <nav id="menuBar" class="menu"></nav>
-
-    <button id="helpBtn" class="icon-btn help" title="Ajuda">?</button>
-    <button id="burger" class="icon-btn burger" title="Menu">☰</button>
+    <div class="topbar-actions">
+      <div class="search-wrap">
+        <input id="searchInput" class="search" type="search" placeholder="Buscar jogo..." aria-label="Buscar jogo" />
+      </div>
+      <select id="categoryFilter" class="select" aria-label="Filtrar por categoria">
+        <option value="">Todas as categorias</option>
+      </select>
+      <button id="helpBtn" class="icon-btn" title="Ajuda" aria-label="Ajuda">?</button>
+      <button id="themeBtn" class="icon-btn" title="Alternar tema" aria-label="Alternar tema">◐</button>
+      <button id="adminPanelBtn" class="btn btn-primary hidden">Painel admin</button>
+      <button id="logoutBtn" class="btn btn-ghost hidden">Sair</button>
+    </div>
   </div>
-  <nav id="menuMobile" class="menu-mobile"></nav>
 </header>
 
+<!-- ================= BODY ================= -->
 <main class="container">
-
-  <!-- ===== BUSCA + FILTROS ===== -->
-  <section class="searchbar">
-    <input id="search" type="search" placeholder="Pesquisar por nome, plataforma, categoria ou código único..." />
-    <div class="filters">
-      <select id="filterCategory"><option value="">Todas as categorias</option></select>
-      <select id="filterPlatform"><option value="">Todas as plataformas</option></select>
-      <select id="sort">
-        <option value="az">Nome (A → Z)</option>
-        <option value="za">Nome (Z → A)</option>
-        <option value="sizeDesc">Tamanho (maior → menor)</option>
-        <option value="sizeAsc">Tamanho (menor → maior)</option>
-      </select>
-      <button id="viewBtn" class="ghost-btn" title="Alternar mosaico/lista">▦ Mosaico</button>
-    </div>
+  <section class="hero">
+    <h1 id="heroTitle">Sua biblioteca de jogos</h1>
+    <p id="heroSubtitle">Clique em um jogo para ver detalhes e baixar.</p>
   </section>
 
-  <!-- ===== GRID ===== -->
-  <section id="grid" class="grid mosaic"></section>
-  <p id="empty" class="empty" hidden>Nenhum jogo encontrado.</p>
+  <section id="gamesGrid" class="grid" aria-live="polite"></section>
 
-  <!-- ===== PAGINAÇÃO ===== -->
-  <nav id="pagination" class="pagination"></nav>
+  <div id="emptyState" class="empty hidden">
+    <div class="empty-emoji">🎮</div>
+    <h2>Nenhum jogo por aqui ainda</h2>
+    <p>Assim que jogos forem cadastrados, eles aparecem nesta página.</p>
+  </div>
+
+  <nav id="publicPager" class="pager hidden" aria-label="Paginação do catálogo">
+    <button class="btn btn-ghost" data-pub-prev>‹ Anterior</button>
+    <span class="pager-info" data-pub-info></span>
+    <button class="btn btn-ghost" data-pub-next>Próxima ›</button>
+  </nav>
 </main>
 
-<!-- ===== RODAPÉ ===== -->
 <footer class="footer">
-  <div class="footer-inner">
-    <div>
-      <h4>Links úteis</h4>
-      <ul id="footerLinks" class="footer-links"></ul>
-    </div>
-    <div>
-      <h4>Atribuição</h4>
-      <p id="footerAttribution" class="muted"></p>
-    </div>
-  </div>
+  <span id="footerText">© <span id="year"></span> GameVault</span>
 </footer>
 
-<!-- botão discreto admin -->
-<button id="adminDot" class="admin-dot" title="Admin">•</button>
+<!-- Botão de login discreto -->
+<button id="discreetLoginBtn" class="discreet-login" title="Acesso restrito" aria-label="Acesso restrito">•</button>
 
-<!-- ===== MODAL JOGO ===== -->
-<div id="gameModal" class="overlay" hidden>
-  <div class="modal">
-    <button class="x" data-close>✕</button>
-    <div class="game-modal">
-      <img id="gmCover" class="gm-cover" alt="Capa do jogo" />
-      <div class="gm-info">
-        <h2 id="gmTitle"></h2>
-        <div id="gmTags" class="tags"></div>
-        <p id="gmDesc" class="muted"></p>
-        <dl class="meta">
-          <div><dt>Plataforma</dt><dd id="gmPlatform"></dd></div>
-          <div><dt>Categoria</dt><dd id="gmCategory"></dd></div>
-          <div><dt>Código</dt><dd id="gmCode"></dd></div>
-          <div><dt>Tamanho</dt><dd id="gmSize"></dd></div>
-        </dl>
-        <a id="gmDownload" class="primary-btn" href="#">⬇ Baixar agora</a>
-      </div>
+<!-- ================= MODAL: DETALHES DO JOGO ================= -->
+<div class="modal-backdrop" id="gameModal" hidden>
+  <div class="modal modal-game" role="dialog" aria-modal="true" aria-labelledby="gmTitle">
+    <button class="modal-close" data-close>×</button>
+    <div class="gm-cover"><img id="gmCover" alt="" /></div>
+    <div class="gm-body">
+      <h2 id="gmTitle"></h2>
+      <div id="gmMeta" class="gm-meta"></div>
+      <div id="gmTags" class="tags"></div>
+      <p id="gmDesc" class="gm-desc"></p>
+      <dl id="gmSpecs" class="specs"></dl>
+      <a id="gmDownload" class="btn btn-primary btn-lg" target="_blank" rel="noopener">⬇ Baixar</a>
     </div>
   </div>
 </div>
 
-<!-- ===== MODAL AJUDA ===== -->
-<div id="helpModal" class="overlay" hidden>
-  <div class="modal narrow">
-    <button class="x" data-close>✕</button>
-    <h2>Como funciona</h2>
-    <div id="helpContent" class="help-content muted"></div>
-  </div>
-</div>
-
-<!-- ===== MODAL LOGIN ===== -->
-<div id="loginModal" class="overlay" hidden>
-  <div class="modal tiny">
-    <button class="x" data-close>✕</button>
-    <h2>Acesso restrito</h2>
+<!-- ================= MODAL: LOGIN ================= -->
+<div class="modal-backdrop" id="loginModal" hidden>
+  <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <button class="modal-close" data-close>×</button>
+    <h2 id="loginTitle">Acesso administrativo</h2>
+    <p class="muted small">Área restrita. Não há cadastro público.</p>
     <form id="loginForm" class="form">
-      <input id="loginEmail" type="email" placeholder="E-mail" required />
-      <input id="loginPass" type="password" placeholder="Senha" required />
-      <button class="primary-btn" type="submit">Entrar</button>
-      <p id="loginError" class="error"></p>
+      <label>E-mail<input type="email" id="loginEmail" required autocomplete="username" /></label>
+      <label>Senha<input type="password" id="loginPass" required autocomplete="current-password" /></label>
+      <p id="loginError" class="error hidden"></p>
+      <button type="submit" class="btn btn-primary btn-block">Entrar</button>
     </form>
   </div>
 </div>
 
-<!-- ===== MODAL ADMIN ===== -->
-<div id="adminModal" class="overlay" hidden>
-  <div class="modal wide">
-    <button class="x" data-close>✕</button>
-    <div class="admin-head">
-      <h2>Painel do administrador</h2>
-      <button id="logoutBtn" class="ghost-btn">Sair</button>
+<!-- ================= MODAL: AJUDA ================= -->
+<div class="modal-backdrop" id="helpModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <button class="modal-close" data-close>×</button>
+    <h2 id="helpTitle">Como funciona</h2>
+    <div id="helpContent" class="prose"></div>
+  </div>
+</div>
+
+<!-- ================= MODAL: PAINEL ADMIN ================= -->
+<div class="modal-backdrop" id="adminModal" hidden>
+  <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <button class="modal-close" data-close>×</button>
+    <h2 id="adminTitle">Painel administrativo</h2>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="tab-games" role="tab">Jogos</button>
+      <button class="tab" data-tab="tab-new" role="tab">Cadastrar</button>
+      <button class="tab" data-tab="tab-brand" role="tab">Identidade</button>
+      <button class="tab" data-tab="tab-help" role="tab">Ajuda</button>
+      <button class="tab" data-tab="tab-backup" role="tab">Backup</button>
     </div>
 
-    <div class="tabs">
-      <button class="tab active" data-tab="games">Jogos</button>
-      <button class="tab" data-tab="menu">Menu</button>
-      <button class="tab" data-tab="footer">Rodapé</button>
-      <button class="tab" data-tab="help">Ajuda</button>
-      <button class="tab" data-tab="theme">Aparência</button>
-    </div>
+    <!-- Aba: lista de jogos com paginação -->
+    <section id="tab-games" class="tabpanel active">
+      <div class="row-between">
+        <input id="adminSearch" class="search" type="search" placeholder="Filtrar por nome..." />
+        <select id="adminPerPage" class="select">
+          <option value="5">5 / página</option>
+          <option value="10" selected>10 / página</option>
+          <option value="20">20 / página</option>
+        </select>
+      </div>
+      <div class="admin-list" id="adminList"></div>
+      <nav class="pager" aria-label="Paginação da lista de jogos">
+        <button class="btn btn-ghost" data-adm-prev>‹ Anterior</button>
+        <span class="pager-info" data-adm-info></span>
+        <button class="btn btn-ghost" data-adm-next>Próxima ›</button>
+      </nav>
+    </section>
 
-    <!-- JOGOS -->
-    <section class="panel active" data-panel="games">
-      <form id="gameForm" class="form grid2">
+    <!-- Aba: cadastro paginado por etapas -->
+    <section id="tab-new" class="tabpanel">
+      <div class="steps" id="formSteps">
+        <span class="step active" data-step="1">1. Básico</span>
+        <span class="step" data-step="2">2. Detalhes</span>
+        <span class="step" data-step="3">3. Download</span>
+      </div>
+
+      <form id="gameForm" class="form">
         <input type="hidden" id="gameId" />
-        <input id="gTitle" placeholder="Título" required />
-        <input id="gPlatform" placeholder="Plataforma" required />
-        <input id="gCategory" placeholder="Categoria" required />
-        <input id="gCode" placeholder="Código único" required />
-        <div class="row">
-          <input id="gSize" type="number" step="0.01" placeholder="Tamanho" required />
-          <select id="gUnit"><option value="MB">MB</option><option value="GB">GB</option></select>
-        </div>
-        <input id="gDownload" placeholder="Link de download direto (archive.org)" required />
-        <textarea id="gDesc" placeholder="Descrição" rows="3" class="span2"></textarea>
-        <input id="gCoverUrl" placeholder="Capa por link externo (https://...)" class="span2" />
-        <div class="span2 row">
-          <input id="gCoverFile" type="file" accept="image/*" />
-          <span class="muted small">Upload é convertido em base64 (Realtime Database)</span>
-        </div>
-        <div class="span2 row">
-          <button class="primary-btn" type="submit">Salvar jogo</button>
-          <button type="button" id="gameReset" class="ghost-btn">Limpar</button>
-        </div>
-      </form>
-      <div id="adminGames" class="admin-list"></div>
-    </section>
 
-    <!-- MENU -->
-    <section class="panel" data-panel="menu">
-      <form id="menuForm" class="form row">
-        <input id="mLabel" placeholder="Nome do item" required />
-        <input id="mUrl" placeholder="Link (https://... ou #)" required />
-        <button class="primary-btn" type="submit">Adicionar</button>
-      </form>
-      <div id="adminMenu" class="admin-list"></div>
-    </section>
+        <fieldset class="form-step active" data-step="1">
+          <label>Título *<input id="fTitle" required /></label>
+          <label>Categoria<input id="fCategory" list="catList" placeholder="Ex: Ação, RPG" /></label>
+          <datalist id="catList"></datalist>
+          <label>URL da capa<input id="fCover" type="url" placeholder="https://..." /></label>
+        </fieldset>
 
-    <!-- RODAPÉ -->
-    <section class="panel" data-panel="footer">
-      <form id="linkForm" class="form row">
-        <input id="lLabel" placeholder="Nome do link" required />
-        <input id="lUrl" placeholder="URL" required />
-        <button class="primary-btn" type="submit">Adicionar</button>
-      </form>
-      <div id="adminLinks" class="admin-list"></div>
-      <form id="attrForm" class="form">
-        <textarea id="attrText" rows="3" placeholder="Texto de atribuição"></textarea>
-        <button class="primary-btn" type="submit">Salvar atribuição</button>
+        <fieldset class="form-step" data-step="2">
+          <label>Descrição<textarea id="fDesc" rows="4"></textarea></label>
+          <div class="grid-2">
+            <label>Ano<input id="fYear" type="number" min="1970" max="2099" /></label>
+            <label>Tamanho<input id="fSize" placeholder="Ex: 12 GB" /></label>
+            <label>Plataforma<input id="fPlatform" placeholder="PC, PS5..." /></label>
+            <label>Nota (0-10)<input id="fRating" type="number" step="0.1" min="0" max="10" /></label>
+          </div>
+          <label>Tags (separadas por vírgula)<input id="fTags" placeholder="multiplayer, offline" /></label>
+        </fieldset>
+
+        <fieldset class="form-step" data-step="3">
+          <label>Link de download *<input id="fDownload" type="url" required placeholder="https://..." /></label>
+          <label>Requisitos mínimos<textarea id="fReq" rows="3"></textarea></label>
+          <label class="checkline"><input type="checkbox" id="fPublished" checked /> Publicado no site</label>
+        </fieldset>
+
+        <p id="formError" class="error hidden"></p>
+
+        <div class="row-between form-nav">
+          <button type="button" class="btn btn-ghost" id="stepPrev">‹ Voltar</button>
+          <div class="row-gap">
+            <button type="button" class="btn btn-ghost" id="formReset">Limpar</button>
+            <button type="button" class="btn btn-primary" id="stepNext">Avançar ›</button>
+            <button type="submit" class="btn btn-primary hidden" id="formSave">Salvar jogo</button>
+          </div>
+        </div>
       </form>
     </section>
 
-    <!-- AJUDA -->
-    <section class="panel" data-panel="help">
+    <!-- Aba: identidade -->
+    <section id="tab-brand" class="tabpanel">
+      <form id="brandForm" class="form">
+        <label>Logo quadrada (1:1) — URL<input id="bLogoSquare" type="url" placeholder="https://..." /></label>
+        <label>Logo escrita (nome por extenso) — URL<input id="bLogoWord" type="url" placeholder="https://..." /></label>
+        <label>Nome do site (fallback)<input id="bSiteName" /></label>
+        <div class="grid-2">
+          <label>Título do topo<input id="bHeroTitle" /></label>
+          <label>Subtítulo do topo<input id="bHeroSubtitle" /></label>
+        </div>
+        <button class="btn btn-primary" type="submit">Salvar identidade</button>
+      </form>
+    </section>
+
+    <!-- Aba: ajuda -->
+    <section id="tab-help" class="tabpanel">
       <form id="helpForm" class="form">
-        <textarea id="helpText" rows="10" placeholder="Explique como o site funciona (uma linha por parágrafo)"></textarea>
-        <button class="primary-btn" type="submit">Salvar ajuda</button>
+        <label>Conteúdo de ajuda (uma linha por parágrafo)
+          <textarea id="hContent" rows="10"></textarea>
+        </label>
+        <button class="btn btn-primary" type="submit">Salvar ajuda</button>
       </form>
     </section>
 
-    <!-- APARÊNCIA -->
-    <section class="panel" data-panel="theme">
-      <form id="themeForm" class="form grid2">
-        <label>Nome do site<input id="tSiteName" /></label>
-        <label>Cor de destaque<input id="tAccent" type="color" /></label>
-        <label>Fundo (escuro)<input id="tBgDark" type="color" /></label>
-        <label>Fundo (claro)<input id="tBgLight" type="color" /></label>
-        <label>Raio das bordas (px)<input id="tRadius" type="number" min="0" max="40" /></label>
-        <label>Logo quadrada 1:1 (link)<input id="tLogoSquare" placeholder="https://..." /></label>
-        <label>Logo escrita (link)<input id="tLogoWord" placeholder="https://..." /></label>
-        <label>Upload logo quadrada<input id="tLogoSquareFile" type="file" accept="image/*" /></label>
-        <label>Upload logo escrita<input id="tLogoWordFile" type="file" accept="image/*" /></label>
-        <div class="span2"><button class="primary-btn" type="submit">Salvar aparência</button></div>
-      </form>
+    <!-- Aba: backup -->
+    <section id="tab-backup" class="tabpanel">
+      <p class="muted small">Exporte um JSON com jogos, identidade e ajuda. A importação substitui ou mescla os dados.</p>
+      <div class="row-gap wrap">
+        <button class="btn btn-primary" id="exportBtn">⬇ Exportar JSON</button>
+        <label class="btn btn-ghost file-btn">⬆ Importar JSON<input type="file" id="importFile" accept="application/json" hidden /></label>
+        <select id="importMode" class="select">
+          <option value="merge">Mesclar (mantém existentes)</option>
+          <option value="replace">Substituir tudo</option>
+        </select>
+      </div>
+      <pre id="backupLog" class="log"></pre>
     </section>
   </div>
 </div>
 
-<script type="module" src="app.js"></script>
+<div id="toast" class="toast" hidden></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
